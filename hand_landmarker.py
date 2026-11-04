@@ -1,3 +1,7 @@
+"""
+Performs live hand landmark detection and draws it on the screen
+"""
+
 import time
 from pathlib import Path
 

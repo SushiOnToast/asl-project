@@ -1,3 +1,8 @@
+"""
+Utility data related to managing and accessing data imported from kaggle in the 
+data/ directory
+"""
+
 import random
 from pathlib import Path
 

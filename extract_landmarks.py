@@ -1,4 +1,7 @@
-# extract the hand landmarks from the dataset images
+"""
+extract the hand landmarks from the dataset images, producing features for training
+"""
+
 import sys
 from pathlib import Path
 

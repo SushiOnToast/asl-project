@@ -1,6 +1,9 @@
-# this file normalises the images by ensuring that the model
-# recieves uniformly sized and positioned hands for classification
-# this is the processing that goes on to generate these features.
+"""
+this file contains utility functions that normalise the images by ensuring that the model
+recieves sized and positioned hands for classification, also includes the functions required
+for testing invariance
+"""
+
 import numpy as np
 
 EPS = 1e-6
@@ -17,7 +20,7 @@ def normalise_hand(hand):
 
     return normalised_hand.flatten()
 
-def test_invariance(hand):
+def check_invariance(hand):
     """
     returns true if normalising hand function returns similar values
     when the hand is shifted and scaled, indicating that the normalisation
@@ -30,6 +33,16 @@ def test_invariance(hand):
     hand_copy_result = normalise_hand(hand_copy)
 
     return np.allclose(hand_result, hand_copy_result)
+
+def check_batch_invariance(X, sizes, n=1000, min_size=0.1):
+    """Shrink + shift real hands; features should not change (for non-tiny hands)."""
+    moved = X * 0.5
+    moved[:, :, :2] += 0.2
+    f1, _ = normalise_batch(X)
+    f2, _ = normalise_batch(moved)
+    diff = np.abs(f1 - f2).max(axis=1)
+    print("max diff, all samples:     ", diff.max())
+    print("max diff, size >= MIN_SIZE:", diff[sizes >= min_size].max())
 
 def normalise_batch(hands):
     """

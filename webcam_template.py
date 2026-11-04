@@ -1,3 +1,7 @@
+"""
+Displays a basic webcam window
+"""
+
 import time
 import cv2
 
