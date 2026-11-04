@@ -23,12 +23,12 @@ CHAINS = [
 CONNECTIONS = [pair for chain in CHAINS for pair in zip(chain, chain[1:])]
 
 
-def make_landmarker():
+def make_landmarker(video=False):
     if not MODEL.exists():
         raise SystemExit(f"Model file not found: {MODEL}")
     options = vision.HandLandmarkerOptions(
         base_options=BaseOptions(model_asset_path=str(MODEL)),
-        running_mode=vision.RunningMode.VIDEO,
+        running_mode=vision.RunningMode.VIDEO if video else vision.RunningMode.IMAGE,
         num_hands=1,
     )
     return vision.HandLandmarker.create_from_options(options)
@@ -58,7 +58,7 @@ def main():
     shape_printed = False
 
     try:
-        with make_landmarker() as landmarker:
+        with make_landmarker(video=True) as landmarker:
             while True:
                 ok, frame = cap.read()
                 if not ok:
