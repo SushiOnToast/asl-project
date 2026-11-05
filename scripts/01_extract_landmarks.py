@@ -3,25 +3,23 @@ extract the hand landmarks from the dataset images, producing features for train
 """
 
 import sys
-from pathlib import Path
 
 import cv2
 import mediapipe as mp
 import numpy as np
 
-from hand_landmarker import make_landmarker, landmarks_to_array
-from data_utils import find_train_dir, list_images
+from asl.hand_landmarker import make_landmarker, landmarks_to_array
+from asl.data import find_train_dir, list_images
+from asl.paths import *
 
-DATA_ROOT = Path("data")
-IMG_EXTS = {".jpg", ".jpeg", ".png"}
 SKIP = {"space", "nothing", "del"}
 
 def main():
     limit = int(sys.argv[1]) if len(sys.argv) > 1 else None
 
-    train_dir = find_train_dir(DATA_ROOT)
+    train_dir = find_train_dir(DATA)
     if train_dir is None:
-        raise SystemExit(f"Couldn't find class folders under {DATA_ROOT}")
+        raise SystemExit(f"Couldn't find class folders under {DATA}")
 
     class_dirs = sorted(p for p in train_dir.iterdir()
                         if p.is_dir() and p.name not in SKIP)
@@ -58,7 +56,7 @@ def main():
                   f"({100 * failed / max(total, 1):.1f}% failed)")
 
     X = np.array(X_list, dtype=np.float32)
-    np.savez_compressed("landmarks_raw.npz", X=X, y=np.array(labels),
+    np.savez_compressed(RAW_LANDMARKS, X=X, y=np.array(labels),
                         paths=np.array(paths))
     print(f"\nSaved landmarks_raw.npz: X shape = {X.shape}")
 

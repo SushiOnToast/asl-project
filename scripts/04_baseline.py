@@ -11,12 +11,13 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 import time
+from asl.paths import *
 
 # load data
-d = np.load("features_clean.npz")
+d = np.load(CLEAN_FEATURES)
 X, y, _ = d["X"], d["y"], d["paths"]
 # load split indexes and split data accordingly
-s = np.load("splits.npz")
+s = np.load(SPLITS)
 Xtr, ytr, Xva, yva = X[s["train"]], y[s["train"]], X[s["val"]], y[s["val"]]
 
 print(Xtr.shape, Xva.shape) 

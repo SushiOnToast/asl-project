@@ -13,7 +13,8 @@ After this, the filtered features are saved into features_clean.npz
 """
 
 import numpy as np
-from normalisation_utils import normalise_batch, check_batch_invariance
+from asl.normalisation import normalise_batch, check_batch_invariance
+from asl.paths import *
 
 MIN_SIZE = 0.1 # we want to drop hands with a size smaller than this otherwise itll blow up the differences
 MAX_FEATURE = 5.0 # drop hands where any features are larger than this
@@ -21,7 +22,7 @@ MAX_FEATURE = 5.0 # drop hands where any features are larger than this
 
 def main():
     # load and separate data
-    d = np.load("landmarks_raw.npz")
+    d = np.load(RAW_LANDMARKS)
     X, y, paths = d["X"], d["y"], d["paths"]
     print("raw:", X.shape)
 
@@ -58,7 +59,7 @@ def main():
     print("max feature after filtering:", np.abs(F[keep]).max())
 
     # save to new features array
-    np.savez_compressed("features_clean.npz",
+    np.savez_compressed(CLEAN_FEATURES,
                         X=F[keep], y=y[keep], paths=paths[keep], sizes=sizes[keep])
     print("saved features_clean.npz:", F[keep].shape)
 

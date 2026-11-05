@@ -10,7 +10,9 @@ import mediapipe as mp
 import numpy as np
 from mediapipe.tasks.python import BaseOptions, vision
 
-MODEL = Path(__file__).parent / "hand_landmarker.task"
+from asl.paths import LANDMARKER_TASK
+
+MODEL = LANDMARKER_TASK
 CAMERA_INDEX = 0
 MIRROR = True
 WINDOW = "Landmarker (q quit, p print)"

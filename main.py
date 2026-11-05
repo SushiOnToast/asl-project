@@ -1,7 +1,7 @@
-from model_utils import load_model, predict
+from asl.inference import load_model, predict
+from asl.hand_landmarker import make_landmarker, landmarks_to_array, draw_hand
 import cv2
 import time
-from hand_landmarker import make_landmarker, landmarks_to_array, draw_hand
 import mediapipe as mp
 import numpy as np
 from collections import deque
