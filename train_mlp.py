@@ -37,7 +37,7 @@ train_loader = DataLoader(LandmarkDataset(Xtr_s, ytr), batch_size=256, shuffle=T
 val_loader = DataLoader(LandmarkDataset(Xva_s, yva), batch_size=1024, shuffle=False)
 
 # initialising model, weights and optimiser
-model = NeuralNetwork(classes=classes).to(device)
+model = NeuralNetwork(len(classes)).to(device)
 counts = np.bincount(ytr)
 weights = len(ytr) / (len(classes) * counts) # rarer classes get bigger weights
 criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights, dtype=torch.float32).to(device))
