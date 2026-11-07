@@ -4,3 +4,5 @@ data/
 artifacts/
 *.pt
 *.npz
+
+test.py

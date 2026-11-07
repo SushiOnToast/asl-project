@@ -1,5 +1,6 @@
 from asl.inference import load_model, predict
 from asl.hand_landmarker import make_landmarker, landmarks_to_array, draw_hand
+from asl import paths
 import cv2
 import time
 import mediapipe as mp
@@ -18,7 +19,7 @@ def main():
     start = prev = time.perf_counter()
     fps = 0.0
 
-    model, classes, mean, std = load_model()
+    model, classes, mean, std = load_model(paths.MODEL_MIRROR)
     class_text = ""
 
     # so that the displayed letter doesn't flicker too much

@@ -7,7 +7,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from asl.model import LandmarkDataset, NeuralNetwork, evaluate
-from asl.paths import *
+from asl import paths
 
 torch.manual_seed(0)
 np.random.seed(0)
@@ -15,7 +15,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Device:", device)
 
 # load data
-d = np.load(CLEAN_FEATURES)
+d = np.load(paths.CLEAN_FEATURES)
 X, y, _ = d["X"], d["y"], d["paths"]
 
 # we need to turn the labels into integers for pytorch
@@ -24,7 +24,7 @@ cls_to_idx = {c: i for i, c in enumerate(classes)}
 y_idx = np.array([cls_to_idx[c] for c in y])
 
 # load split indexes and split data accordingly
-s = np.load(SPLITS)
+s = np.load(paths.SPLITS)
 Xtr, ytr, Xva, yva = X[s["train"]], y_idx[s["train"]], X[s["val"]], y_idx[s["val"]]
 
 # standardise data using mean and std
@@ -75,7 +75,7 @@ for epoch in range(1, EPOCHS + 1):
         best_acc, best_epoch = val_acc, epoch
         # save model as checkpoint
         torch.save({"model": model.state_dict(), "classes": classes,
-                    "mean": mean, "std": std}, MODEL)
+                    "mean": mean, "std": std}, paths.MODEL)
     # stop early if it doesn't improve after a certain amount of epochs
     elif epoch - best_epoch >= PATIENCE:
         print(f"No improvement for {PATIENCE} epochs, stopping early.")

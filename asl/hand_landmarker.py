@@ -3,16 +3,15 @@ Performs live hand landmark detection and draws it on the screen
 """
 
 import time
-from pathlib import Path
 
 import cv2
 import mediapipe as mp
 import numpy as np
 from mediapipe.tasks.python import BaseOptions, vision
 
-from asl.paths import LANDMARKER_TASK
+from asl import paths
 
-MODEL = LANDMARKER_TASK
+MODEL = paths.LANDMARKER_TASK
 CAMERA_INDEX = 0
 MIRROR = True
 WINDOW = "Landmarker (q quit, p print)"

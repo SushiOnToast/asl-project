@@ -10,16 +10,16 @@ import numpy as np
 
 from asl.hand_landmarker import make_landmarker, landmarks_to_array
 from asl.data import find_train_dir, list_images
-from asl.paths import *
+from asl import paths
 
 SKIP = {"space", "nothing", "del"}
 
 def main():
     limit = int(sys.argv[1]) if len(sys.argv) > 1 else None
 
-    train_dir = find_train_dir(DATA)
+    train_dir = find_train_dir(paths.DATA)
     if train_dir is None:
-        raise SystemExit(f"Couldn't find class folders under {DATA}")
+        raise SystemExit(f"Couldn't find class folders under {paths.DATA}")
 
     class_dirs = sorted(p for p in train_dir.iterdir()
                         if p.is_dir() and p.name not in SKIP)
@@ -56,7 +56,7 @@ def main():
                   f"({100 * failed / max(total, 1):.1f}% failed)")
 
     X = np.array(X_list, dtype=np.float32)
-    np.savez_compressed(RAW_LANDMARKS, X=X, y=np.array(labels),
+    np.savez_compressed(paths.RAW_LANDMARKS, X=X, y=np.array(labels),
                         paths=np.array(paths))
     print(f"\nSaved landmarks_raw.npz: X shape = {X.shape}")
 

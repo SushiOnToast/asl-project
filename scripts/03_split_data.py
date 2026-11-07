@@ -8,9 +8,9 @@ would be memorising. Therefore, this program ensures that the video frames are i
 import re
 from pathlib import Path
 import numpy as np
-from asl.paths import *
+from asl import paths
 
-d = np.load(CLEAN_FEATURES)
+d = np.load(paths.CLEAN_FEATURES)
 y, paths = d["y"], d["paths"]
 
 
@@ -46,4 +46,4 @@ print("every row used once:", len(set(np.concatenate([train, val, test]))) == le
 print("M samples in train/val/test:",
       (y[train] == "M").sum(), (y[val] == "M").sum(), (y[test] == "M").sum())
 
-np.savez(SPLITS, train=train, val=val, test=test)
+np.savez(paths.SPLITS, train=train, val=val, test=test)

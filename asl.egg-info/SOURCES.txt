@@ -1,0 +1,13 @@
+pyproject.toml
+asl/__init__.py
+asl/data.py
+asl/hand_landmarker.py
+asl/inference.py
+asl/model.py
+asl/normalisation.py
+asl/paths.py
+asl/webcam_template.py
+asl.egg-info/PKG-INFO
+asl.egg-info/SOURCES.txt
+asl.egg-info/dependency_links.txt
+asl.egg-info/top_level.txt

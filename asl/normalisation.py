@@ -59,18 +59,23 @@ def normalise_batch(hands):
 
     return normalised_hands.reshape(len(hands), -1), hand_sizes
 
+def mirror(hands):
+    """
+    Takes in a batch of normalised hands in shape (N, 63), returns mirrored hands
+    in the exact same shape (it negates the x value)
+    """
+    h = hands.copy()
+    h = h.reshape(len(hands), 21, 3)
+    h[:, :, 0] *= -1
+
+    return h.reshape(len(hands), -1)
+
+# testing
 if __name__ == "__main__":
     hands = np.random.rand(5, 21, 3).astype(np.float32)
 
-    # invariance: shrink + shift must not change the features
-    moved = hands * 0.5
-    moved[:, :, :2] += 0.2
-    f1, _ = normalise_batch(hands)
-    f2, _ = normalise_batch(moved)
-    print("invariant:", np.allclose(f1, f2, atol=1e-5))
+    normalised, _ = normalise_batch(hands)
 
-    # batch matches single-hand version
-    print("batch == single:", np.allclose(f1[2], normalise_hand(hands[2]), atol=1e-6))
-    print("shape:", f1.shape)
+    print(f"Original and mirror(mirror(F)) similarity: {np.allclose(normalised, mirror(mirror(normalised)))}")
 
     

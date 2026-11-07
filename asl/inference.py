@@ -1,10 +1,9 @@
 import torch
 from asl.model import NeuralNetwork
-from asl.paths import MODEL
 from asl.normalisation import normalise_batch
 
-def load_model():
-    saved = torch.load(MODEL, weights_only=False)
+def load_model(model_path):
+    saved = torch.load(model_path, weights_only=False)
     model = NeuralNetwork(len(saved["classes"]))
     model.load_state_dict(saved["model"])
     model.eval()
