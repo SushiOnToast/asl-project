@@ -1,6 +1,7 @@
 from asl.inference import load_model, predict
 from asl.hand_landmarker import make_landmarker, landmarks_to_array, draw_hand
 from asl import paths
+from asl.reference import first_clean_image_per_letter, build_reference_grid
 import cv2
 import time
 import mediapipe as mp
@@ -26,6 +27,11 @@ def main():
     buffer = deque(maxlen=SMOOTH_FRAMES)
 
     flip_input = True
+
+    # reference grid
+    grid, cell_post = build_reference_grid(first_clean_image_per_letter())
+    cv2.namedWindow("Reference")
+    cv2.moveWindow("Reference", 700, 0)
 
     try:
         with make_landmarker(video=True) as landmarker:
@@ -76,6 +82,7 @@ def main():
                 cv2.putText(frame, f"Flip input: {flip_input}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
                 cv2.imshow(WINDOW, frame)
+                cv2.imshow("Reference", grid)
 
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord("q"):
