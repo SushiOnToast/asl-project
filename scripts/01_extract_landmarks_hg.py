@@ -56,7 +56,7 @@ def main():
 
                 if img is None:
                     failed += 1
-                    start[sid][1] += 1
+                    stats[sid][1] += 1
                     continue
 
                 h, w = img.shape[:2]
@@ -76,7 +76,7 @@ def main():
                     stats[sid][0] += 1
                 else:
                     failed += 1
-                    start[sid][1] += 1
+                    stats[sid][1] += 1
 
             total = success + failed
             print(
@@ -90,7 +90,7 @@ def main():
         success, failed = stats[sid]
         print(
             f"  P{sid:>2}: {success}/{success + failed} detected "
-            f"({100 * failed / max(success):.1f}% failed)"
+            f"({100 * failed / max(success + failed, 1):.1f}% failed)"
         )
 
     X = np.array(X_list, dtype=np.float32)
