@@ -1,3 +1,8 @@
+"""
+This script does a zero-shot evaluation using the most recent model up till this point (the mirro model) to see how well it does on the newly imported
+asl_hg dataset.
+"""
+
 from asl.inference import load_model
 from asl import paths
 import numpy as np
