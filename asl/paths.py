@@ -1,3 +1,7 @@
+"""
+This file contains all the paths that are reimported across files, so that they can be imported and reused.
+"""
+
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

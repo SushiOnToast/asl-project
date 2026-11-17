@@ -1,3 +1,7 @@
+"""
+This file contains the basic functions required to import an MLP into a file and utilise its predictions.
+"""
+
 import torch
 from asl.model import NeuralNetwork
 from asl.normalisation import normalise_batch

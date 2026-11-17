@@ -1,3 +1,7 @@
+"""
+This file contains the Landmark Dataset and Neural Network class, as well as the evaluate function used for training.
+"""
+
 import torch
 from torch import nn
 from torch.utils.data import Dataset

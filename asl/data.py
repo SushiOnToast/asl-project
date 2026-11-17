@@ -1,3 +1,7 @@
+"""
+Utility functions for managing asl datasets
+"""
+
 IMG_EXTS = {".jpg", ".jpeg", ".png"}
 
 def find_train_dir(root):
