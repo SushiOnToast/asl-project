@@ -11,7 +11,7 @@ import numpy as np
 from asl import paths
 
 d = np.load(paths.CLEAN_FEATURES)
-y, paths = d["y"], d["paths"]
+y, img_paths = d["y"], d["paths"]
 
 
 def frame_number(p):
@@ -24,7 +24,7 @@ train, val, test = [], [], []
 for letter in np.unique(y):
     # order indexes of these specific letters in the global list
     letter_idx = np.where(y == letter)[0]                     
-    frames = np.array([frame_number(p) for p in paths[letter_idx]])
+    frames = np.array([frame_number(p) for p in img_paths[letter_idx]])
     ordered = letter_idx[np.argsort(frames)] # sort the global indexes 
 
     # splitting letter into train, val, test
