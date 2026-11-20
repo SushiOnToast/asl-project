@@ -8,8 +8,10 @@ from asl import paths
 import numpy as np
 import cv2
 
-def first_clean_image_per_letter():
-    d = np.load(paths.CLEAN_FEATURES)
+DATASET_PATHS = [paths.CLEAN_FEATURES, paths.CLEAN_FEATURES_HG]
+
+def first_clean_image_per_letter(data_path):
+    d = np.load(data_path)
     y, img_paths = d["y"], d["paths"]
 
     return {str(c): img_paths[y == c][0] for c in np.unique(y)}
@@ -38,7 +40,8 @@ def build_reference_grid(ref_path, cell=110, cols=7):
 
 
 if __name__ == "__main__":
-    grid, _ = build_reference_grid(first_clean_image_per_letter())
+    data_path = DATASET_PATHS[0]
+    grid, _ = build_reference_grid(first_clean_image_per_letter(data_path))
     print("grid shape:", grid.shape)            
     cv2.imshow("Reference", grid)
     cv2.waitKey(0)

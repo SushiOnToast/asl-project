@@ -11,6 +11,8 @@ from collections import deque
 CAMERA_INDEX = 0
 WINDOW = "ASL Detection (q to quit)"
 SMOOTH_FRAMES = 8
+DATASET_PATHS = [paths.CLEAN_FEATURES, paths.CLEAN_FEATURES_HG]
+
 
 def main():
     cap = cv2.VideoCapture(CAMERA_INDEX)
@@ -20,16 +22,17 @@ def main():
     start = prev = time.perf_counter()
     fps = 0.0
 
-    model, classes, mean, std = load_model(paths.MODEL_MIRROR)
+    model, classes, mean, std = load_model(paths.MODEL_COMBINED)
     class_text = ""
 
     # so that the displayed letter doesn't flicker too much
     buffer = deque(maxlen=SMOOTH_FRAMES)
 
-    flip_input = True
-
     # reference grid
-    grid, cell_post = build_reference_grid(first_clean_image_per_letter())
+    data_path_idx = 0
+    grid, cell_post = build_reference_grid(
+        first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
+    )
     cv2.namedWindow("Reference")
     cv2.moveWindow("Reference", 700, 0)
 
@@ -40,8 +43,7 @@ def main():
                 if not res:
                     print("Frame read failed, stopping.")
                     break
-                if flip_input:
-                    frame = cv2.flip(frame, 1)
+                frame = cv2.flip(frame, 1)
 
                 # Detect on the clean frame, before drawing anything on it
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -56,12 +58,14 @@ def main():
                     landmark_mat = landmarks_to_array(hand)
                     draw_hand(frame, hand)
                     h, w = frame.shape[:2]
-                    probs, ok = predict(model, mean, std, landmark_mat, frame_h=h, frame_w=w)
+                    probs, ok = predict(
+                        model, mean, std, landmark_mat, frame_h=h, frame_w=w
+                    )
 
                     # display result
                     if ok:
                         buffer.append(probs)
-                        avg = np.mean(buffer, axis=0) 
+                        avg = np.mean(buffer, axis=0)
                         class_text = f"{classes[avg.argmax()]} ({avg.max() * 100:.0f}%)"
                     else:
                         buffer.clear()
@@ -70,16 +74,30 @@ def main():
                     buffer.clear()
                     class_text = "No Hand"
 
-
                 # Smoothed FPS
                 now = time.perf_counter()
                 fps = 0.9 * fps + 0.1 * (1 / (now - prev))
                 prev = now
 
                 # drawing
-                cv2.putText(frame, f"FPS: {fps:.0f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                cv2.putText(frame, class_text, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                cv2.putText(frame, f"Flip input: {flip_input}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(
+                    frame,
+                    f"FPS: {fps:.0f}",
+                    (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.7,
+                    (0, 255, 0),
+                    2,
+                )
+                cv2.putText(
+                    frame,
+                    class_text,
+                    (10, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.7,
+                    (0, 255, 0),
+                    2,
+                )
 
                 cv2.imshow(WINDOW, frame)
                 cv2.imshow("Reference", grid)
@@ -87,10 +105,14 @@ def main():
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord("q"):
                     break
-                if key == ord("f"):
-                    flip_input = not flip_input
-                    buffer.clear()
-                
+                if key == ord("e"):
+                    data_path_idx += 1
+                    if data_path_idx > len(DATASET_PATHS) - 1:
+                        data_path_idx = 0
+                    grid, cell_post = build_reference_grid(
+                        first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
+                    )
+
     finally:
         cap.release()
         cv2.destroyAllWindows()
