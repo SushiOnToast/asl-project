@@ -2,6 +2,7 @@ from asl.inference import load_model, predict
 from asl.hand_landmarker import make_landmarker, landmarks_to_array, draw_hand
 from asl import paths
 from asl.reference import first_clean_image_per_letter, build_reference_grid
+from asl.translation import FingerSpeller
 import cv2
 import time
 import mediapipe as mp
@@ -36,6 +37,11 @@ def main():
     cv2.namedWindow("Reference")
     cv2.moveWindow("Reference", 700, 0)
 
+    fingerspeller = FingerSpeller()
+    letter = None
+    confidence = 0.0
+    text = ""
+
     try:
         with make_landmarker(video=True) as landmarker:
             while True:
@@ -44,6 +50,7 @@ def main():
                     print("Frame read failed, stopping.")
                     break
                 frame = cv2.flip(frame, 1)
+                h, w = frame.shape[:2]
 
                 # Detect on the clean frame, before drawing anything on it
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -57,7 +64,6 @@ def main():
                     hand = result.hand_landmarks[0]
                     landmark_mat = landmarks_to_array(hand)
                     draw_hand(frame, hand)
-                    h, w = frame.shape[:2]
                     probs, ok = predict(
                         model, mean, std, landmark_mat, frame_h=h, frame_w=w
                     )
@@ -66,18 +72,28 @@ def main():
                     if ok:
                         buffer.append(probs)
                         avg = np.mean(buffer, axis=0)
-                        class_text = f"{classes[avg.argmax()]} ({avg.max() * 100:.0f}%)"
+                        letter = classes[avg.argmax()]
+                        confidence = float(avg.max())
+                        class_text = f"{letter} ({confidence * 100:.0f}%)"
                     else:
                         buffer.clear()
+                        letter = None
+                        confidence = 0.0
                         class_text = "Move Closer"
                 else:
                     buffer.clear()
+                    letter = None
+                    confidence = 0.0
                     class_text = "No Hand"
 
                 # Smoothed FPS
                 now = time.perf_counter()
                 fps = 0.9 * fps + 0.1 * (1 / (now - prev))
                 prev = now
+
+                output = fingerspeller.update(letter, confidence)
+                if output:
+                    text += output
 
                 # drawing
                 cv2.putText(
@@ -98,6 +114,20 @@ def main():
                     (0, 255, 0),
                     2,
                 )
+                cv2.putText(
+                    frame,
+                    text[-30:],
+                    (10, h - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1.0,
+                    (0, 255, 0),
+                    2,
+                )
+
+                # progress bar to commit letter
+                bar_w = int(200 * fingerspeller.progress)
+                cv2.rectangle(frame, (10, 75), (210, 90), (80, 80, 80), 1)    
+                cv2.rectangle(frame, (10, 75), (10 + bar_w, 90), (0, 255, 0), -1)
 
                 cv2.imshow(WINDOW, frame)
                 cv2.imshow("Reference", grid)
@@ -112,6 +142,14 @@ def main():
                     grid, cell_post = build_reference_grid(
                         first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
                     )
+
+                # typing controls
+                if key == 32:                   
+                    text += " "
+                elif key == 8:                  
+                    text = text[:-1]
+                elif key == ord("c"):
+                    text = ""
 
     finally:
         cap.release()
