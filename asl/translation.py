@@ -1,3 +1,8 @@
+"""
+Class that keeps track of the current letter being predicted and commits a letter to output if it has
+been predicted above a certain confidence level for a certain amount of frames (see main.py for usage details)
+"""
+
 class FingerSpeller:
     def __init__(self, confidence_threshold=0.8, hold_frames=20):
         self.confidence_threshold = confidence_threshold
