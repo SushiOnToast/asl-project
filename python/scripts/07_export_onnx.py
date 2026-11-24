@@ -31,4 +31,38 @@ torch.onnx.export(
     json.dumps({"classes": list(classes), "mean": mean.tolist(), "std": std.tolist()})
 )
 
+# parity fixtures (tests to see if exported onnx produces identical results, will be used by vitest in web folder)
+raw = np.load(paths.RAW_LANDMARKS)["X"]
+rng = np.random.default_rng(0)  # random generator
+cases = []
+
+for n, i in enumerate(
+    rng.choice(len(raw), 8, replace=False)
+):  # pick 8 features [indexes]
+    hand = raw[i].astype(np.float32).copy()
+    w, h = (
+        (200, 200) if n % 2 == 0 else (640, 480)
+    )  # testing different aspect rations (both camera and image)
+    if n == 7:
+        hand = (hand[0] + (hand - hand[0]) * 0.2).astype(
+            np.float32
+        )  # make a tiny hand with expected result of being rejected
+    probs, ok = predict(model, mean, std, hand, frame_h=h, frame_w=w)
+
+    mat = hand.copy()
+    mat[:, 1] *= h / w
+    feats, size = normalise_batch(mat[None])
+    cases.append(
+        {
+            "landmarks": hand.tolist(),
+            "width": w,
+            "height": h,
+            "features": feats[0].tolist(),
+            "size": float(size[0]),
+            "valid": bool(ok),
+            "probs": probs.tolist() if ok else None,
+        }
+    )
+
+(OUT / "fixtures.json").write_text(json.dumps(cases))
 
