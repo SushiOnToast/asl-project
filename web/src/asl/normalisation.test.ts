@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { normaliseHand, isValidHand } from "./normalisation";
 import type { Landmark } from "./types";
+import fixtures from "../../public/model/fixtures.json";
 
 describe("normaliseHand", () => {
   const landmarks: Landmark[] = Array.from({ length: 21 }, (_, i) => ({
@@ -40,4 +41,34 @@ describe("normaliseHand", () => {
 
     expect(isValidHand(result)).toBe(false);
   });
+});
+
+// testing with actual features from python folder now
+
+describe("Python / Typescript preprocessing parity", () => {
+  it.each(fixtures)(
+    "matches Python preprocessing (valid: $valid)",
+    (fixture) => {
+      const landmarks: Landmark[] = fixture.landmarks.map(([x, y, z]) => ({
+        x,
+        y,
+        z,
+      }));
+
+      const result = normaliseHand(landmarks, fixture.width, fixture.height);
+
+      expect(result.features.length).toBe(63);
+
+      // comparing features
+      for (let i = 0; i < 63; i++) {
+        expect(result.features[i]).toBeCloseTo(fixture.features[i], 4);
+      }
+
+      // compare hand size
+      expect(result.size).toBeCloseTo(fixture.size, 5);
+
+      // compare validity
+      expect(isValidHand(result)).toBe(fixture.valid);
+    },
+  );
 });
