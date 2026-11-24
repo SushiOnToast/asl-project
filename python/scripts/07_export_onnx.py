@@ -52,12 +52,14 @@ for n, i in enumerate(
     mat = hand.copy()
     mat[:, 1] *= h / w
     feats, size = normalise_batch(mat[None])
+    standardised_features = (feats[0] - mean) / std
     cases.append(
         {
             "landmarks": hand.tolist(),
             "width": w,
             "height": h,
             "features": feats[0].tolist(),
+            "standardised_features": standardised_features.tolist(),
             "size": float(size[0]),
             "valid": bool(ok),
             "probs": probs.tolist() if ok else None,
@@ -65,4 +67,3 @@ for n, i in enumerate(
     )
 
 (OUT / "fixtures.json").write_text(json.dumps(cases))
-
