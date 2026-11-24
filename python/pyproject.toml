@@ -1,0 +1,11 @@
+[project]
+name = "asl-alphabet-recognition"
+version = "0.1.0"
+description = "Interface that detects asl alphabet and allows for fingerspelling"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages=["asl"]

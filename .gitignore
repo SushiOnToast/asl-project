@@ -6,7 +6,8 @@ artifacts/
 *.pt
 *.npz
 
-test.py
+*.egg-info/
+*.egg
 
 # Logs
 logs
