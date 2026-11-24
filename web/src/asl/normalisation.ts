@@ -7,7 +7,7 @@ export function normaliseHand(
   frameWidth: number,
   frameHeight: number,
 ): NormalisedHand {
-  if (landmarks.length != 21) {
+  if (landmarks.length !== 21) {
     throw new Error(`Expected 21 landmarks, received ${landmarks.length}`);
   }
 
@@ -31,11 +31,12 @@ export function normaliseHand(
   ]);
 
   // calculating hand size
-  const handSize = Math.max(Math.hypot(relative[9][0], relative[9][1]), EPS);
+  const handSize = Math.hypot(relative[9][0], relative[9][1]); // keep original floating values
+  const scale = Math.max(handSize, EPS);
 
   // scale and flatten into 63 features.
   const features = new Float32Array(
-    relative.flatMap(([x, y, z]) => [x / handSize, y / handSize, z / handSize]),
+    relative.flatMap(([x, y, z]) => [x / scale, y / scale, z / scale]),
   );
 
   return {
@@ -51,7 +52,8 @@ export function isValidHand(hand: NormalisedHand): boolean {
   }
 
   for (const feature of hand.features) {
-    if (Math.abs(feature) > 5) {
+    // isfinite used to prevent NaN features from sliding through
+    if (!Number.isFinite(feature) || Math.abs(feature) > 5) {
       return false;
     }
   }
