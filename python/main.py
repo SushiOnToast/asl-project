@@ -71,6 +71,7 @@ def main():
                     # display result
                     if ok:
                         buffer.append(probs)
+                        # averaging across past frames to get concrete reading
                         avg = np.mean(buffer, axis=0)
                         letter = classes[avg.argmax()]
                         confidence = float(avg.max())
