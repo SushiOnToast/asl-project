@@ -1,0 +1,86 @@
+:root {
+  --bg: #12141a;
+  --panel: #1c1f28;
+  --text: #e8eaf0;
+  --muted: #9aa0b0;
+  --accent: #4ade80;
+  --warn: #fbbf24;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 { margin: 8px 0 4px; font-size: 1.6rem; }
+.sub, .tips, footer { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+
+.stage {
+  position: relative;
+  width: 100%;
+  background: var(--panel);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 240px;
+}
+
+/* mirror both so the preview behaves like a mirror (the model gets the unmirrored video) */
+.stage video, .stage canvas { transform: scaleX(-1); }
+.stage video { display: block; width: 100%; height: auto; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.status {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+}
+
+.readout { display: flex; align-items: center; gap: 16px; margin: 16px 0 8px; }
+.letter { font-size: 3rem; font-weight: 700; min-width: 5.5rem; color: var(--muted); }
+.letter.sure { color: var(--accent); }
+.letter small { font-size: 0.9rem; font-weight: 400; margin-left: 6px; }
+
+.bar { flex: 1; height: 14px; background: var(--panel); border-radius: 999px; overflow: hidden; }
+#bar-fill { height: 100%; width: 0; background: var(--accent); transition: width 0.05s linear; }
+
+.sentence {
+  min-height: 3.2rem;
+  padding: 12px 14px;
+  background: var(--panel);
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+button:hover:not(:disabled) { background: #2a2f3c; }
+button:disabled { opacity: 0.5; cursor: default; }
+#start { background: var(--accent); color: #0b1a10; font-weight: 600; }
+
+footer { margin-top: 24px; border-top: 1px solid var(--panel); padding-top: 12px; }

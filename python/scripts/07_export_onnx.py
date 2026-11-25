@@ -11,6 +11,8 @@ from asl import paths
 from asl.inference import load_model, predict
 from asl.normalisation import normalise_batch
 
+import onnx
+
 # this is where we will store the model for web version use
 OUT = paths.ROOT.parent / "web" / "public" / "model"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -24,7 +26,12 @@ torch.onnx.export(
     str(OUT / "asl_mlp.onnx"),
     input_names=["features"],
     output_names=["logits"],
+    external_data=False
 )
+
+onnx_path = str(OUT / "asl_mlp.onnx")
+onnx_model = onnx.load(onnx_path)
+onnx.save_model(onnx_model, onnx_path, save_as_external_data=False)
 
 # writing the other data into a metadata file (classes, mean, std)
 (OUT / "metadata.json").write_text(

@@ -1,13 +1,40 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASL Alphabet Detector</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASL Alphabet Detector</title>
+</head>
+
+<body>
+  <main>
+    <h1>ASL Alphabet Recognition</h1>
+    <div class="stage">
+      <video id="video" playisinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="status" class="status">Loading model...</div>
+    </div>
+
+    <div class="readout">
+      <div id="letter" class="letter"></div>
+      <div class="bar">
+        <div id="bar-fill"></div>
+      </div>
+    </div>
+
+    <div id="sentence" class="sentence"></div>
+
+    <div class="buttons">
+      <button id="start" disabled>Start camera</button>
+      <button id="space">Space</button>
+      <button id="backspace">Backspace</button>
+      <button id="clear">Clear</button>
+    </div>
+
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>
