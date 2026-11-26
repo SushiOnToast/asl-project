@@ -6,32 +6,46 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASL Alphabet Detector</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 
 <body>
   <main>
-    <h1>ASL Alphabet Recognition</h1>
-    <div class="stage">
-      <video id="video" playisinline muted></video>
-      <canvas id="overlay"></canvas>
-      <div id="status" class="status">Loading model...</div>
-    </div>
+    <h1>ASL Alphabet Fingerspeller</h1>
+    <div id="content-container">
+      <div class="stage">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div id="status" class="status">Loading model...</div>
 
-    <div class="readout">
-      <div id="letter" class="letter"></div>
-      <div class="bar">
-        <div id="bar-fill"></div>
+        <button id="camera-toggle" disabled>Turn Camera On</button>
+
+      </div>
+
+      <div>
+        <div class="readout">
+          <div id="letter" class="letter"></div>
+          <div class="bar">
+            <div id="bar-fill"></div>
+          </div>
+        </div>
+
+        <div id="sentence" class="sentence"></div>
+
+        <div class="buttons">
+          <button id="space">Space</button>
+          <button id="backspace">Backspace</button>
+          <button id="clear">Clear</button>
+        </div>
       </div>
     </div>
 
-    <div id="sentence" class="sentence"></div>
 
-    <div class="buttons">
-      <button id="start" disabled>Start camera</button>
-      <button id="space">Space</button>
-      <button id="backspace">Backspace</button>
-      <button id="clear">Clear</button>
-    </div>
 
   </main>
   <script type="module" src="/src/main.ts"></script>

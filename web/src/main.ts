@@ -17,7 +17,6 @@ const BASE = import.meta.env.BASE_URL;
 const CONFIDENCE_THRESHOLD = 0.8;
 const HOLD_FRAMES = 20;
 const SMOOTH_FRAMES = 8; // buffer smoothing
-const SENTENCE_VISIBLE_CHARS = 40;
 
 // helper to get element by id
 function el<T extends HTMLElement>(id: string): T {
@@ -32,7 +31,7 @@ const statusEl = el<HTMLDivElement>("status");
 const letterEl = el<HTMLDivElement>("letter");
 const barFill = el<HTMLDivElement>("bar-fill");
 const sentenceEl = el<HTMLDivElement>("sentence");
-const startBtn = el<HTMLButtonElement>("start");
+const cameraBtn = el<HTMLButtonElement>("camera-toggle");
 
 const ctx = canvas.getContext("2d");
 if (!ctx) throw new Error("Canvas 2D context is not available");
@@ -40,7 +39,7 @@ if (!ctx) throw new Error("Canvas 2D context is not available");
 let sentence = "";
 
 function renderSentence(): void {
-  sentenceEl.textContent = sentence.slice(-SENTENCE_VISIBLE_CHARS) + "▌";
+  sentenceEl.textContent = sentence + "▌";
 }
 
 function addText(s: string): void {
@@ -91,6 +90,11 @@ interface Models {
   landmarker: HandLandmarker;
 }
 
+let models: Models | null = null;
+let cameraOn = false;
+let cameraStream: MediaStream | null = null;
+let stopDetection: (() => void) | null = null;
+
 async function loadModels(): Promise<Models> {
   ort.env.wasm.wasmPaths = {
     wasm: wasmUrl,
@@ -117,7 +121,7 @@ async function loadModels(): Promise<Models> {
 }
 
 async function startCamera(): Promise<void> {
-  const stream = await navigator.mediaDevices.getUserMedia({
+  const cameraStream = await navigator.mediaDevices.getUserMedia({
     video: {
       width: { ideal: 640 },
       height: { ideal: 480 },
@@ -126,18 +130,43 @@ async function startCamera(): Promise<void> {
     audio: false,
   });
 
-  video.srcObject = stream;
+  video.srcObject = cameraStream;
   video.muted = true;
   await video.play();
 }
 
+function stopCamera(): void {
+  if (stopDetection) {
+    stopDetection();
+    stopDetection = null;
+  }
+
+  // stop camera tracks
+  cameraStream?.getTracks().forEach((track) => track.stop());
+  cameraStream = null;
+  video.pause();
+  video.srcObject = null;
+
+  ctx!.clearRect(0, 0, canvas.width, canvas.height);
+
+  cameraOn = false;
+  cameraBtn.textContent = "Turn Camera On";
+  letterEl.textContent = "–";
+  letterEl.classList.remove("sure");
+  barFill.style.width = "0%";
+
+  setStatus("Camera off");
+}
+
 // same main function as main.py
-function runLoop({ classifier, metadata, landmarker }: Models): void {
+function runLoop({ classifier, metadata, landmarker }: Models): () => void {
   const buffer = new ProbabilityBuffer(SMOOTH_FRAMES);
   const speller = new FingerSpeller(CONFIDENCE_THRESHOLD, HOLD_FRAMES);
   const drawing = new DrawingUtils(ctx!);
   let lastVideoTime = -1;
   let busy = false;
+  let stopped = false;
+  let frameId = 0;
 
   // to run every frame (basically while loop from main.py)
   async function tick(): Promise<void> {
@@ -146,6 +175,7 @@ function runLoop({ classifier, metadata, landmarker }: Models): void {
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
+      document.documentElement.style.setProperty("--ar", String(w / h));
     }
 
     const result = landmarker.detectForVideo(video, performance.now());
@@ -156,13 +186,16 @@ function runLoop({ classifier, metadata, landmarker }: Models): void {
 
     const landmarks = result.landmarks[0];
     if (landmarks) {
-      drawing.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, {
-        color: "#ffffff",
-        lineWidth: 2,
-      });
-      drawing.drawLandmarks(landmarks, { color: "#4ade80", radius: 3 });
+      // drawing.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, {
+      //   color: "#ffffff",
+      //   lineWidth: 2,
+      // });
+      // drawing.drawLandmarks(landmarks, { color: "#4ade80", radius: 3 });
 
       const probs = await classifyHand(landmarks, w, h, classifier, metadata);
+
+      if (stopped) return;
+
       if (probs) {
         buffer.push(probs);
         const top = topPrediction(buffer.mean(), metadata.classes);
@@ -196,7 +229,9 @@ function runLoop({ classifier, metadata, landmarker }: Models): void {
   }
 
   function loop(): void {
-    requestAnimationFrame(loop);
+    if (stopped) return;
+
+    frameId = requestAnimationFrame(loop);
     if (busy || video.readyState < 2 || video.currentTime === lastVideoTime)
       return;
     lastVideoTime = video.currentTime; // timestamps must increase and to not send the same frame we check that before
@@ -208,7 +243,12 @@ function runLoop({ classifier, metadata, landmarker }: Models): void {
       });
   }
 
-  requestAnimationFrame(loop);
+  frameId = requestAnimationFrame(loop);
+
+  return () => {
+    stopped = true;
+    cancelAnimationFrame(frameId);
+  };
 }
 
 async function main(): Promise<void> {
@@ -219,32 +259,49 @@ async function main(): Promise<void> {
   } catch (err) {
     console.error(err);
     setStatus("Could not load model");
+    return;
   }
 
   setStatus("Ready, start the camera");
-  startBtn.disabled = false;
+  cameraBtn.disabled = false;
 
-  startBtn.addEventListener("click", async () => {
-    startBtn.disabled = true;
-    setStatus("Waiting for camera permission...");
-    try {
-      await startCamera();
-    } catch (err) {
-      console.error(err);
-      const denied =
-        err instanceof DOMException && err.name === "NotAllowedError";
-      setStatus(
-        denied
-          ? "Camera permission denied. Allow it and reload."
-          : "Could not start the camera.",
-      );
-      startBtn.disabled = false;
+  cameraBtn.addEventListener("click", async () => {
+    if (cameraOn) {
+      stopCamera();
       return;
     }
 
-    startBtn.style.display = "none";
-    setStatus("No hand detected");
-    runLoop(models);
+    cameraBtn.disabled = true;
+    setStatus("Waiting for camera permission...");
+
+    try {
+      await startCamera();
+
+      cameraOn = true;
+      cameraBtn.textContent = "Turn Camera Off";
+
+      setStatus("No hand detected");
+
+      stopDetection = runLoop(models!);
+    } catch (err) {
+      console.error(err);
+
+      // Clean up in case the stream started but video.play() failed
+      cameraStream?.getTracks().forEach((track) => track.stop());
+      cameraStream = null;
+      video.srcObject = null;
+
+      const denied =
+        err instanceof DOMException && err.name === "NotAllowedError";
+
+      setStatus(
+        denied
+          ? "Camera permission denied. Allow it and try again."
+          : "Could not start the camera.",
+      );
+    } finally {
+      cameraBtn.disabled = false;
+    }
   });
 }
 
