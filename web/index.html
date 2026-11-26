@@ -5,49 +5,81 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASL Alphabet Detector</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>ASL Alphabet Fingerspeller</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-    rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    rel="stylesheet" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
 </head>
 
-<body>
-  <main>
-    <h1>ASL Alphabet Fingerspeller</h1>
-    <div id="content-container">
-      <div class="stage">
-        <video id="video" playsinline muted></video>
-        <canvas id="overlay"></canvas>
-        <div id="status" class="status">Loading model...</div>
+<body class="flex items-center justify-center">
+  <main class="mx-auto w-full max-w-[1100px] p-4">
 
-        <button id="camera-toggle" disabled>Turn Camera On</button>
+    <h1 class="mb-8 text-center text-[2.5rem] font-bold text-accent">
+      ASL Alphabet Fingerspeller
+    </h1>
 
+    <div id="content-container"
+      class="grid grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)] items-start gap-4 max-[820px]:grid-cols-1">
+
+      <!-- Camera -->
+      <div
+        class="stage relative w-full overflow-hidden rounded-xl bg-panel shadow-[0_0_0_3px_var(--color-bg),0_0_0_5px_var(--color-muted)] max-[820px]:mx-auto max-[820px]:w-[min(100%,calc(42dvh*var(--ar)))]"
+        style="aspect-ratio: var(--ar)">
+        <video id="video" playsinline muted class="block h-full w-full scale-x-[-1] object-cover"></video>
+
+        <canvas id="overlay" class="absolute inset-0 h-full w-full scale-x-[-1]"></canvas>
+
+        <div id="status" class="absolute bottom-2 left-2 rounded-full bg-black/60 px-3 py-1 text-sm">
+          Loading model...
+        </div>
+
+        <button id="camera-toggle" disabled
+          class="absolute right-3 top-3 z-10 rounded-lg border border-accent bg-bg/80 px-4 py-2.5 font-semibold text-text backdrop-blur-md transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg disabled:opacity-50">
+          Turn Camera On
+        </button>
       </div>
 
+      <!-- Prediction and sentence -->
       <div>
-        <div class="readout">
-          <div id="letter" class="letter"></div>
-          <div class="bar">
-            <div id="bar-fill"></div>
+
+        <div class="my-4 flex items-center gap-4">
+          <div id="letter" class="min-h-[1.2em] min-w-[5.5rem] text-5xl font-bold text-muted"></div>
+
+          <div class="h-3.5 flex-1 overflow-hidden rounded-full bg-panel">
+            <div id="bar-fill" class="h-full w-0 rounded-full bg-accent transition-[width] duration-75"></div>
           </div>
         </div>
 
-        <div id="sentence" class="sentence"></div>
+        <div id="sentence"
+          class="min-h-[3.2rem] break-all whitespace-pre-wrap rounded-xl bg-panel p-3 font-mono text-2xl"></div>
 
-        <div class="buttons">
-          <button id="space">Space</button>
-          <button id="backspace">Backspace</button>
-          <button id="clear">Clear</button>
+        <div class="my-3 flex flex-wrap gap-2">
+          <button id="space"
+            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+            Space
+          </button>
+
+          <button id="backspace"
+            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+            Backspace
+          </button>
+
+          <button id="clear"
+            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+            Clear
+          </button>
         </div>
+
       </div>
     </div>
-
-
-
   </main>
+
   <script type="module" src="/src/main.ts"></script>
 </body>
 
