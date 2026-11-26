@@ -20,70 +20,120 @@
 <body class="flex items-center justify-center">
   <main class="mx-auto w-full max-w-[1100px] p-4">
 
-    <h1 class="mb-8 text-center text-[2.5rem] font-bold text-accent">
+    <h1 class="mb-8 text-center text-3xl sm:text-[2.5rem] font-bold text-accent leading-none">
       ASL Alphabet Fingerspeller
     </h1>
 
-    <div id="content-container"
-      class="grid grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)] items-start gap-4 max-[820px]:grid-cols-1">
+    <div class="mb-6 flex justify-center">
+      <button id="tutorial-toggle"
+        class="rounded-lg border border-muted bg-panel px-5 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg"
+        aria-expanded="false" aria-controls="tutorial-view">
+        How to use
+      </button>
+    </div>
 
-      <!-- Camera -->
-      <div
-        class="stage relative w-full overflow-hidden rounded-xl bg-panel shadow-[0_0_0_3px_var(--color-bg),0_0_0_5px_var(--color-muted)] max-[820px]:mx-auto max-[820px]:w-[min(100%,calc(42dvh*var(--ar)))]"
-        style="aspect-ratio: var(--ar)">
-        <video id="video" playsinline muted class="block h-full w-full scale-x-[-1] object-cover"></video>
+    <div id="app-view">
+      <div id="content-container"
+        class="grid grid-cols-[minmax(0,1.5fr)_minmax(300px,1fr)] items-start gap-4 max-[820px]:grid-cols-1">
 
-        <canvas id="overlay" class="absolute inset-0 h-full w-full scale-x-[-1]"></canvas>
+        <!-- Camera -->
+        <div
+          class="stage relative w-full overflow-hidden rounded-xl bg-panel shadow-[0_0_0_3px_var(--color-bg),0_0_0_5px_var(--color-muted)] max-[820px]:mx-auto max-[820px]:w-[min(100%,calc(42dvh*var(--ar)))]"
+          style="aspect-ratio: var(--ar)">
+          <video id="video" playsinline muted class="block h-full w-full scale-x-[-1] object-cover"></video>
 
-        <div id="status" class="absolute bottom-2 left-2 rounded-full bg-black/60 px-3 py-1 text-sm">
-          Loading model...
+          <canvas id="overlay" class="absolute inset-0 h-full w-full scale-x-[-1]"></canvas>
+
+          <div id="status" class="absolute bottom-2 left-2 rounded-full bg-black/60 px-3 py-1 text-sm">
+            Loading model...
+          </div>
+
+          <button id="camera-toggle" disabled
+            class="absolute right-3 top-3 z-10 rounded-lg border border-accent bg-bg/80 px-4 py-2.5 font-semibold text-text backdrop-blur-md transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg disabled:opacity-50">
+            Start Camera
+          </button>
+
+          <button id="landmarks-toggle"
+            class="absolute right-3 top-16 z-10 rounded-lg border border-muted bg-bg/80 px-4 py-2.5 font-semibold text-text backdrop-blur-md transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg"
+            aria-pressed="true">
+            Hide Skeleton
+          </button>
         </div>
 
-        <button id="camera-toggle" disabled
-          class="absolute right-3 top-3 z-10 rounded-lg border border-accent bg-bg/80 px-4 py-2.5 font-semibold text-text backdrop-blur-md transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg disabled:opacity-50">
-          Turn Camera On
-        </button>
+        <!-- Prediction and sentence -->
+        <div>
 
-        <button id="landmarks-toggle"
-          class="absolute right-3 top-16 z-10 rounded-lg border border-muted bg-bg/80 px-4 py-2.5 font-semibold text-text backdrop-blur-md transition-all duration-100 hover:border-accent hover:bg-accent hover:text-bg"
-          aria-pressed="true">
-          Hide Skeleton
-        </button>
+          <div class="my-4 flex items-center gap-4">
+            <div id="letter" class="min-h-[1.2em] min-w-[5.5rem] text-5xl font-bold text-muted"></div>
+
+            <div class="h-3.5 flex-1 overflow-hidden rounded-full bg-panel">
+              <div id="bar-fill" class="h-full w-0 rounded-full bg-accent transition-[width] duration-75"></div>
+            </div>
+          </div>
+
+          <div id="sentence"
+            class="min-h-[3.2rem] break-all whitespace-pre-wrap rounded-xl bg-panel p-3 font-mono text-2xl"></div>
+
+          <div class="my-3 flex flex-wrap gap-2">
+            <button id="space"
+              class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+              Space
+            </button>
+
+            <button id="backspace"
+              class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+              Backspace
+            </button>
+
+            <button id="clear"
+              class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+              Clear
+            </button>
+          </div>
+
+        </div>
       </div>
+    </div>
 
-      <!-- Prediction and sentence -->
-      <div>
+    <!-- Tutorial slideshow -->
+    <section id="tutorial-view" class="w-full" aria-label="How to use the ASL fingerspeller" hidden>
+      <div
+        class="grid grid-cols-1 items-center gap-5 px-2 py-4 sm:h-[65dvh] sm:min-h-[400px] sm:max-h-[600px] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] sm:gap-8 sm:p-8">
 
-        <div class="my-4 flex items-center gap-4">
-          <div id="letter" class="min-h-[1.2em] min-w-[5.5rem] text-5xl font-bold text-muted"></div>
+        <!-- Image -->
+        <div class="flex h-[32dvh] min-h-[180px] max-h-[300px] items-center justify-center sm:h-full sm:max-h-none">
+          <img id="tutorial-image" class="h-full max-w-full rounded-xl object-contain" src="" alt="" />
+        </div>
 
-          <div class="h-3.5 flex-1 overflow-hidden rounded-full bg-panel">
-            <div id="bar-fill" class="h-full w-0 rounded-full bg-accent transition-[width] duration-75"></div>
+        <!-- Text and navigation -->
+        <div
+          class="flex flex-col items-center gap-4 text-center sm:items-start sm:justify-center sm:gap-5 sm:text-left">
+          <h2 id="tutorial-title" class="text-2xl font-bold text-accent sm:text-3xl"></h2>
+
+          <p id="tutorial-description" class="max-w-md text-sm leading-relaxed sm:text-base"></p>
+
+          <div class="mt-2 flex w-full flex-col items-center gap-3 sm:items-start">
+            <p id="tutorial-counter" class="text-sm text-muted"></p>
+
+            <div id="tutorial-progress" class="flex w-full justify-center gap-2 sm:justify-start"></div>
+
+            <div class="mt-2 flex gap-3">
+              <button id="tutorial-back"
+                class="rounded-lg border border-muted bg-panel px-5 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:border-muted disabled:hover:bg-panel disabled:hover:text-text">
+                Back
+              </button>
+
+              <button id="tutorial-next"
+                class="rounded-lg border border-muted bg-panel px-5 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
+                Next
+              </button>
+            </div>
           </div>
         </div>
 
-        <div id="sentence"
-          class="min-h-[3.2rem] break-all whitespace-pre-wrap rounded-xl bg-panel p-3 font-mono text-2xl"></div>
-
-        <div class="my-3 flex flex-wrap gap-2">
-          <button id="space"
-            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
-            Space
-          </button>
-
-          <button id="backspace"
-            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
-            Backspace
-          </button>
-
-          <button id="clear"
-            class="rounded-lg border border-muted bg-panel px-4 py-2.5 text-text transition-all duration-100 hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-bg">
-            Clear
-          </button>
-        </div>
-
       </div>
-    </div>
+    </section>
+
   </main>
 
   <script type="module" src="/src/main.ts"></script>

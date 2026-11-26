@@ -17,4 +17,15 @@ export const elements = {
   sentence: el<HTMLDivElement>("sentence"),
   cameraBtn: el<HTMLButtonElement>("camera-toggle"),
   landmarksBtn: el<HTMLButtonElement>("landmarks-toggle"),
+  tutorialBtn: el<HTMLButtonElement>("tutorial-toggle"),
+  appView: el<HTMLDivElement>("app-view"),
+  tutorialView: el<HTMLElement>("tutorial-view"),
+
+  tutorialImage: el<HTMLImageElement>("tutorial-image"),
+  tutorialTitle: el<HTMLHeadingElement>("tutorial-title"),
+  tutorialDescription: el<HTMLParagraphElement>("tutorial-description"),
+  tutorialCounter: el<HTMLParagraphElement>("tutorial-counter"),
+  tutorialProgress: el<HTMLDivElement>("tutorial-progress"),
+  tutorialBack: el<HTMLButtonElement>("tutorial-back"),
+  tutorialNext: el<HTMLButtonElement>("tutorial-next"),
 };

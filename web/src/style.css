@@ -23,11 +23,29 @@
     @apply m-0 min-h-screen min-h-dvh bg-bg text-text font-pixel;
   }
 
-  button {
-    @apply cursor-pointer;
-  }
+  @layer base {
+    body {
+      @apply m-0 min-h-screen min-h-dvh bg-bg text-text font-pixel;
+    }
 
-  button:disabled {
-    @apply cursor-default;
+    button {
+      @apply cursor-pointer transition-all duration-100;
+    }
+
+    button:not(:disabled):hover {
+      @apply -translate-y-0.5 border-accent bg-accent text-bg;
+    }
+
+    button:disabled {
+      @apply cursor-not-allowed;
+    }
+
+    button:disabled:hover {
+      @apply translate-y-0;
+    }
+
+    button:focus-visible {
+      @apply outline-2 outline-offset-2 outline-accent;
+    }
   }
 }

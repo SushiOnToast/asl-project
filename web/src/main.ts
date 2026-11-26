@@ -1,6 +1,7 @@
 import "./style.css";
 
 import { elements } from "./ui/elements";
+import { setupTutorial } from "./ui/tutorial";
 import { createSentenceEditor } from "./ui/sentence";
 import { setupKeyboard } from "./ui/keyboard";
 import { updatePrediction, resetPrediction, setStatus } from "./ui/prediction";
@@ -40,7 +41,7 @@ function turnCameraOff(): void {
   cameraStream = null;
   cameraOn = false;
 
-  elements.cameraBtn.textContent = "Turn Camera On";
+  elements.cameraBtn.textContent = "Start Camera";
 
   resetPrediction();
   setStatus("Camera off");
@@ -59,7 +60,7 @@ async function turnCameraOn(): Promise<void> {
     cameraStream = await startCamera(elements.video);
 
     cameraOn = true;
-    elements.cameraBtn.textContent = "Turn Camera Off";
+    elements.cameraBtn.textContent = "Stop Camera";
 
     setStatus("No hand detected");
 
@@ -155,5 +156,7 @@ window.addEventListener("pagehide", () => {
     turnCameraOff();
   }
 });
+
+setupTutorial();
 
 void main();
