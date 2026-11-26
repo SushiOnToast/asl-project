@@ -16,4 +16,5 @@ export const elements = {
   barFill: el<HTMLDivElement>("bar-fill"),
   sentence: el<HTMLDivElement>("sentence"),
   cameraBtn: el<HTMLButtonElement>("camera-toggle"),
+  landmarksBtn: el<HTMLButtonElement>("landmarks-toggle"),
 };

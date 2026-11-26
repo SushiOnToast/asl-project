@@ -3,12 +3,15 @@ import { FingerSpeller, ProbabilityBuffer } from "../speller";
 
 import type { ASLModels, DetectionUpdate } from "./types";
 
+import { DrawingUtils, HandLandmarker } from "@mediapipe/tasks-vision";
+
 interface DetectionLoopOptions {
   models: ASLModels;
   video: HTMLVideoElement;
   canvas: HTMLCanvasElement;
   onUpdate: (update: DetectionUpdate) => void;
   onTypedLetter: (letter: string) => void;
+  showLandmarks: () => boolean;
 }
 
 const CONFIDENCE_THRESHOLD = 0.8;
@@ -21,6 +24,7 @@ export function startDetectionLoop({
   canvas,
   onUpdate,
   onTypedLetter,
+  showLandmarks,
 }: DetectionLoopOptions): () => void {
   const { classifier, metadata, landmarker } = models;
 
@@ -34,6 +38,7 @@ export function startDetectionLoop({
   }
 
   const ctx: CanvasRenderingContext2D = context;
+  const drawingUtils = new DrawingUtils(ctx);
 
   let lastVideoTime = -1;
   let busy = false;
@@ -67,6 +72,20 @@ export function startDetectionLoop({
     const landmarks = result.landmarks[0];
 
     if (landmarks) {
+
+      if (showLandmarks()) {
+        drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, {
+          color: "#ffffff",
+          lineWidth: 3,
+        });
+
+        drawingUtils.drawLandmarks(landmarks, {
+          color: "#ff0000",
+          lineWidth: 1,
+          radius: 4,
+        });
+      }
+
       const probabilities = await classifyHand(
         landmarks,
         width,

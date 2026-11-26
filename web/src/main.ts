@@ -17,6 +17,7 @@ let cameraStream: MediaStream | null = null;
 let stopDetection: (() => void) | null = null;
 let cameraOn = false;
 let starting = false;
+let showLandmarks = true;
 
 const sentence = createSentenceEditor();
 
@@ -66,7 +67,7 @@ async function turnCameraOn(): Promise<void> {
       models,
       video: elements.video,
       canvas: elements.canvas,
-
+      showLandmarks: () => showLandmarks,
       onUpdate: (update) => {
         updatePrediction(update);
         setStatus(update.status);
@@ -112,6 +113,24 @@ function setupCameraButton(): void {
   });
 }
 
+// Landmark visibility toggle
+function setupLandmarksButton(): void {
+  elements.landmarksBtn.addEventListener("click", () => {
+    showLandmarks = !showLandmarks;
+
+    elements.landmarksBtn.textContent = showLandmarks
+      ? "Hide Skeleton"
+      : "Show Skeleton";
+
+    elements.landmarksBtn.setAttribute(
+      "aria-pressed",
+      String(showLandmarks),
+    );
+
+    elements.landmarksBtn.blur();
+  });
+}
+
 // Application entry point
 async function main(): Promise<void> {
   try {
@@ -123,6 +142,7 @@ async function main(): Promise<void> {
 
     elements.cameraBtn.disabled = false;
     setupCameraButton();
+    setupLandmarksButton();
   } catch (error) {
     console.error("Model loading error:", error);
     setStatus("Could not load model");
