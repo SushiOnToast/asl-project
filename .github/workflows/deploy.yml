@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     defaults:
@@ -24,10 +24,6 @@ jobs:
 
     env:
       VITE_BASE: /${{ github.event.repository.name }}/
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -52,8 +48,17 @@ jobs:
       - name: Upload build
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./web/dist
+          path: web/dist
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
