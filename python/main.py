@@ -31,11 +31,16 @@ def main():
 
     # reference grid
     data_path_idx = 0
-    grid, cell_post = build_reference_grid(
-        first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
-    )
-    cv2.namedWindow("Reference")
-    cv2.moveWindow("Reference", 700, 0)
+
+    grid = None
+    try:
+        grid, cell_pos = build_reference_grid(
+            first_clean_image_per_letter(DATASET_PATHS[0])
+        )
+        cv2.namedWindow("Reference")
+        cv2.moveWindow("Reference", 700, 0)
+    except (FileNotFoundError, KeyError, OSError):
+        print("Dataset not found: running without the reference window.")
 
     fingerspeller = FingerSpeller()
     letter = None
@@ -127,27 +132,35 @@ def main():
 
                 # progress bar to commit letter
                 bar_w = int(200 * fingerspeller.progress)
-                cv2.rectangle(frame, (10, 75), (210, 90), (80, 80, 80), 1)    
+                cv2.rectangle(frame, (10, 75), (210, 90), (80, 80, 80), 1)
                 cv2.rectangle(frame, (10, 75), (10 + bar_w, 90), (0, 255, 0), -1)
 
                 cv2.imshow(WINDOW, frame)
-                cv2.imshow("Reference", grid)
+
+                if grid is not None:
+                    cv2.imshow("Reference", grid)
 
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord("q"):
                     break
+
                 if key == ord("e"):
-                    data_path_idx += 1
-                    if data_path_idx > len(DATASET_PATHS) - 1:
-                        data_path_idx = 0
-                    grid, cell_post = build_reference_grid(
-                        first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
-                    )
+                    data_path_idx = (data_path_idx + 1) % len(DATASET_PATHS)
+
+                    try:
+                        grid, cell_pos = build_reference_grid(
+                            first_clean_image_per_letter(DATASET_PATHS[data_path_idx])
+                        )
+                    except (FileNotFoundError, KeyError, OSError):
+                        grid = None
+                        print(
+                            "Dataset not found: running without the reference window."
+                        )
 
                 # typing controls
-                if key == 32:                   
+                if key == 32:
                     text += " "
-                elif key == 8:                  
+                elif key == 8:
                     text = text[:-1]
                 elif key == ord("c"):
                     text = ""

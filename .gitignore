@@ -1,9 +1,9 @@
 # python
 .venv/
+venv/
 __pycache__/
 data/
 artifacts/
-*.pt
 *.npz
 
 *.egg-info/
